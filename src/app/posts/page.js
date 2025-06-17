@@ -1,11 +1,18 @@
 import Link from "next/link";
+import { db } from "@/utils/dbconnection";
+
+export const metadata = {
+  title: "Posts - Next.js",
+  description: "A simple blog built with Next.js",
+};
 
 export default async function PostsPage({ searchParams }) {
   const queryStr = await searchParams;
-
-  const response = await fetch("https://dummyjson.com/posts");
-  const posts = await response.json();
-  const data = posts.posts;
+  const posts = (
+    await db.query(
+      `SELECT posts.id, posts.title, posts.content, categories.name AS category FROM posts JOIN categories ON category_id = categories.id`
+    )
+  ).rows;
 
   // reverse is an ARRAY function that does what it says
   //   if (queryStr.sort === "desc") {
@@ -25,11 +32,11 @@ export default async function PostsPage({ searchParams }) {
 
   // to sort numerically:
   if (queryStr.sort === "asc") {
-    data.sort((a, b) => {
+    posts.sort((a, b) => {
       return a.id - b.id;
     });
   } else if (queryStr.sort === "desc") {
-    data.sort((a, b) => {
+    posts.sort((a, b) => {
       return b.id - a.id;
     });
   }
@@ -40,9 +47,11 @@ export default async function PostsPage({ searchParams }) {
       <Link href="/posts?sort=asc">Sort ascending</Link> |{" "}
       <Link href="/posts?sort=desc">Sort descending</Link>
       <ul>
-        {data.map((post) => (
+        {posts.map((post) => (
           <li key={post.id}>
-            <Link href={`/post/${post.id}`}>{post.title}</Link>
+            <Link href={`/post/${post.id}`}>
+              {post.title} | {post.category}
+            </Link>
           </li>
         ))}
       </ul>

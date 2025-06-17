@@ -1,5 +1,13 @@
 import Link from "next/link";
 
+export async function generateMetadata({ params, searchParams }, parent) {
+  const id = (await params).id;
+  const response = await fetch(`https://dummyjson.com/posts/${id}`);
+  const post = await response.json();
+
+  return { title: post.title };
+}
+
 export default async function PostPage({ params }) {
   const slug = await params;
   const response = await fetch(`https://dummyjson.com/posts/${slug.id}`);

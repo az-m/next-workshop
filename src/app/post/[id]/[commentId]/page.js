@@ -1,6 +1,12 @@
+export async function generateMetadata({ params }, parent) {
+  const id = (await params).commentId;
+
+  return { title: `Comment no. ${id}` };
+}
+
 export default async function CommentPage({ params }) {
   const slug = await params;
-  console.log(slug);
+
   return (
     <>
       <h2>
